@@ -1,18 +1,17 @@
 quarkus.http.port=
 quarkus.http.cors=
 
-quarkus.datasource.db-kind=
 quarkus.datasource.username=
 quarkus.datasource.password=
 quarkus.datasource.jdbc.url=
 
-quarkus.hibernate-orm.packages=
+quarkus.hibernate-orm.packages=gob.regionancash.sgds.jpa
 
 quarkus.datasource.minsa.db-kind=
 quarkus.datasource.minsa.username=
 quarkus.datasource.minsa.password=
 quarkus.datasource.minsa.jdbc.url=
-quarkus.datasource.minsa.jdbc.max-size=
+quarkus.datasource.minsa.jdbc.max-size=16
 
-quarkus.hibernate-orm.minsa.datasource=
-quarkus.hibernate-orm.minsa.packages=
+quarkus.hibernate-orm.minsa.datasource=minsa
+quarkus.hibernate-orm.minsa.packages=gob.regionancash.minsa.jpa

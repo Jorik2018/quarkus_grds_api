@@ -157,7 +157,6 @@ public class PPFFService {
 	}
 
 	public void destroy(Integer id) {
-		// TODO Auto-generated method stub
 		EntityManager em = new PPFF().getEntityManager();
 		PPFF v = em.find(PPFF.class, id);
 		em.remove(v);

@@ -17,6 +17,8 @@ import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import io.agroal.api.AgroalDataSource;
+import io.quarkus.agroal.DataSource;
+
 import org.isobit.util.XUtil;
 
 import gob.regionancash.minsa.jpa.TCertDisc;
@@ -28,6 +30,7 @@ import gob.regionancash.minsa.jpa.VaccineCOVID;
 public class CovidService {
 	
 	@Inject
+	@DataSource("minsa")
 	AgroalDataSource defaultDataSource;
 	
 	public Object edit(Vaccine complaint){
@@ -127,7 +130,6 @@ public class CovidService {
 				VaccineCOVID covid=new VaccineCOVID();
 				Date date=rs.getDate("fecha_vacunacion");
 				if(date!=null)
-					
 					covid.setFechaVacunacion(new Date(date.getTime()).toInstant()
 						      .atZone(ZoneId.systemDefault())
 						      .toLocalDate());

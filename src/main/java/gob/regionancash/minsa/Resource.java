@@ -34,6 +34,7 @@ import gob.regionancash.minsa.jpa.Covid;
 import gob.regionancash.minsa.jpa.PPFF;
 import gob.regionancash.minsa.jpa.TRegistroDiario;
 import gob.regionancash.minsa.jpa.Vaccine;
+import gob.regionancash.sgds.jpa.MicroRed;
 import gob.regionancash.sgds.jpa.Red;
 
 @Path("")
@@ -173,7 +174,7 @@ public class Resource {
 		if (lugarVacunacion != null)
 			m.put("lugarVacunacion", lugarVacunacion);
 
-		m.put("data", new ArrayList());
+		m.put("data",MicroRed.listAll());
 		return m;
 	}
 

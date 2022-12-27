@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -19,8 +20,10 @@ import javax.transaction.Transactional;
 import io.agroal.api.AgroalDataSource;
 import io.quarkus.agroal.DataSource;
 
+import org.isobit.app.jpa.User;
 import org.isobit.util.XUtil;
 
+import gob.regionancash.grds.mssql.jpa.Disabled;
 import gob.regionancash.minsa.jpa.TCertDisc;
 import gob.regionancash.minsa.jpa.Vaccine;
 import gob.regionancash.minsa.jpa.VaccineCOVID;
@@ -160,7 +163,7 @@ public class CovidService {
 		return l;
 	}
 
-	public Object loadDisabled(Integer from, Integer to, Object object, Map filters) {
+	public Object loadDisabledCertificate(Integer from, Integer to, Object object, Map filters) {
 		List l = new ArrayList();
 		Object numDoc = XUtil.isEmpty(filters.get("numDoc"), null);
 		Object query = XUtil.isEmpty(filters.get("query"), null);
@@ -241,5 +244,140 @@ public class CovidService {
 		}
 		return l;
 	}
-	
+
+    public List<Disabled> loadDisabled(Integer from, Integer to, Object object, Map filters) {
+        EntityManager em=Disabled.getEntityManager();
+		Object filter = XUtil.isEmpty(filters.get("filter"), null);
+        Object columns = XUtil.isEmpty(filters.get("columns"), null);
+        Object code = XUtil.isEmpty(filters.get("code"), null);
+        Object names = XUtil.isEmpty(filters.get("names"), null);
+        Object surnames = XUtil.isEmpty(filters.get("surnames"), null);
+        List<Query> ql = new ArrayList();
+        String sql;
+        //User u = userFacade.getCurrentUser();
+        boolean can_admin =true;// userFacade.access("DESARROLLO_SOCIAL_ADMIN_DISABLED", u, true);
+        ql.add(em.createQuery("SELECT "+(columns==null?"o,t.name ":columns) + 
+                
+                (sql = " FROM Disabled o "
+               // + (columns != null ? " LEFT JOIN District d ON d.code=o.districtId LEFT JOIN d.province p " : "")
+                        + "LEFT JOIN Town2 t ON t.id=o.town WHERE o.canceled=0 " //+ (filter != null ? " AND UPPER(w.name) like :filter" : "")
+                + (!can_admin ? " AND o.province IN :province" : "")
+                + (code != null ? " AND concat(o.code,'') like :code" : "")
+                + (names != null ? " AND UPPER(o.names) like :names" : "")
+                + (surnames != null ? " AND upper(o.surnames) like :surnames" : "")) + "  ORDER BY 1 DESC"));
+        if (to > 0) {
+            ql.get(0).setFirstResult(from).setMaxResults(to);
+            ql.add(em.createQuery("SELECT COUNT(o) " + sql));
+        }
+        for (Query q : ql) {
+            /*if (!can_admin) {
+                List l = netFacade.getUserScopeList(u);
+                l.add(0);
+                q.setParameter("province", l);
+            }*/
+            if (filter != null) {
+                q.setParameter("filter", "%" + filter.toString().toUpperCase().replace(" ", "%") + "%");
+            }
+            if (code != null) {
+                q.setParameter("code", "%" + code + "%");
+            }
+            if (names != null) {
+                q.setParameter("names", "%" + names.toString().toUpperCase().replace(" ", "%") + "%");
+            }
+            if (surnames != null) {
+                q.setParameter("surnames", "%" + surnames.toString().toUpperCase().replace(" ", "%") + "%");
+            }
+        }
+        if (to > 0) {
+            filters.put("size", ql.get(1).getSingleResult());
+        }
+        List l = columns!=null?ql.get(0).getResultList():
+		((List<Object[]>)ql.get(0).getResultList()).stream().map((row)->{
+			Disabled t = (Disabled) row[0];
+			t.setTownName((String) row[1]);
+			return t;
+		}).collect(Collectors.toList());
+
+
+        List ids = new ArrayList();
+        if(columns==null){
+            for (Disabled c : (List<Disabled>)l)
+                if (c.getDistrict() != null) {
+                    ids.add(XUtil.intValue(c.getDistrict()));
+                }
+        }else{
+            for (Object[] c : (List<Object[]>)l)
+                if (c[5]!= null) {
+                    ids.add(XUtil.intValue(c[5]));
+                }
+        }
+        /*if (!ids.isEmpty()) {
+            Map m = new HashMap();
+            for (Object[] r : (List<Object[]>) super.getEntityManager().createQuery("SELECT 0+d.code,d.name,p.code,p.name FROM District d JOIN d.province p WHERE (0+d.code) IN (:ids)")
+                    .setParameter("ids", ids)
+                    .getResultList()) {
+                m.put(r[0], r);
+            }
+            if(columns==null){
+                for (Disabled c : (List<Disabled>)l) {
+                    HashMap hm = new HashMap();
+                    Object row[] = (Object[]) m.get(XUtil.intValue(c.getDistrict()));
+                    if (row != null) {
+                        c.setDistrictName((String) row[1]);
+                        c.setProvinceName((String) row[3]);
+                        hm.put("ubigeo", row);
+                    }
+                    c.setExt(hm);
+                }
+            }else{
+                for (Object[] c : (List<Object[]>)l) {
+                    HashMap hm = new HashMap();
+                    Object row[] = (Object[]) m.get(XUtil.intValue(c[5]));
+                    if (row != null) {
+                        c[6]=((String) row[1]);
+                        c[7]=((String) row[3]);
+                        hm.put("ubigeo", row);
+                    }
+                }
+            }
+        }*/
+        return l;
+    }
+
+	public Disabled findDisabled(Integer id) {
+		EntityManager em=Disabled.getEntityManager();
+        Disabled o = em.find(Disabled.class, id);
+        HashMap ext = new HashMap();
+        int province = XUtil.intValue(o.getDistrict()) / 100;
+        ext.put("province", province);
+        o.setExt(ext);
+        return o;
+	}
+
+	public void saveDisabled(Disabled entity) {
+		EntityManager em=Disabled.getEntityManager();
+        
+        //if (entity.getUpdateDate()== null) {
+        //entity.setUpdateDate(X.getServerDate());
+        //}
+        if (entity.getUser() == null) {
+            /*User u = userFacade.getCurrentUser();
+            People p = (People) sessionFacade.get("people");
+            if (p != null) {
+                entity.setUser(XUtil.intValue(p.getCode()));
+            } else if (u != null) {
+                entity.setUser(-XUtil.intValue(u.getIdDir()));
+            }*/
+        }
+        if (entity.getId() == null) {
+			em.persist(entity);
+        } else {
+            em.merge(entity);
+        }
+        Map ext = (Map) entity.getExt();
+        if (ext != null && !XUtil.isEmpty(ext.get("tempFile"))) {
+            //changeImage(entity.getId(), (String) ext.get("tempFile"));
+        }
+    }
+
 }

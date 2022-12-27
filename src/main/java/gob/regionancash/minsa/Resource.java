@@ -28,17 +28,18 @@ import javax.ws.rs.core.StreamingOutput;
 
 import io.agroal.api.AgroalDataSource;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
+import gob.regionancash.grds.jpa.MicroRed;
+import gob.regionancash.grds.jpa.Red;
+import gob.regionancash.grds.mssql.jpa.Disabled;
 import gob.regionancash.minsa.jpa.Covid;
 import gob.regionancash.minsa.jpa.PPFF;
 import gob.regionancash.minsa.jpa.TRegistroDiario;
 import gob.regionancash.minsa.jpa.Vaccine;
-import gob.regionancash.sgds.jpa.MicroRed;
-import gob.regionancash.sgds.jpa.Red;
 
 @Path("")
 @RequestScoped
+@Produces(MediaType.APPLICATION_JSON)
 public class Resource {
 
 	@Inject
@@ -48,14 +49,12 @@ public class Resource {
 
 	@GET
 	@Path("")
-	@Produces(MediaType.APPLICATION_JSON)
 	public Object hello() {
 		return 777;
 	}
 
 	@GET
 	@Path("/{from}/{size}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public List hello(@PathParam Integer from, @PathParam Integer size, @QueryParam("query") String filter)
 			throws SQLException {
 		// http://localhost:8080/admin/desarrollo-social/api/covid/0/10?query=10676301&distinct=1
@@ -91,21 +90,18 @@ public class Resource {
 
 	@GET
 	@Path("/vaccine/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public Object get(@PathParam Integer id) throws SQLException {
 		return service.getVaccine(id);
 	}
 
 	@DELETE
 	@Path("/vaccine/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public void destroy(@PathParam Integer id) throws SQLException {
 		service.destroy(id);
 	}
 
 	@GET
 	@Path("/vaccine/{from}/{to}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public Object list(@PathParam Integer from, @PathParam Integer to, @QueryParam("query") String filter,
 			@QueryParam("datos") String datos, @QueryParam("numDoc") String numDoc,
 			@QueryParam("segundaDosis") String segundaDosis, @QueryParam("numCelular") String numCelular,
@@ -130,7 +126,6 @@ public class Resource {
 
 	@GET
 	@Path("/red/{from}/{to}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public Object listRed(@PathParam Integer from, @PathParam Integer to, @QueryParam("query") String filter,
 			@QueryParam("datos") String datos, @QueryParam("numDoc") String numDoc,
 			@QueryParam("segundaDosis") String segundaDosis, @QueryParam("numCelular") String numCelular,
@@ -155,7 +150,6 @@ public class Resource {
 
 	@GET
 	@Path("/microred/{from}/{to}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public Object listMicrored(@PathParam Integer from, @PathParam Integer to, @QueryParam("query") String filter,
 			@QueryParam("datos") String datos, @QueryParam("numDoc") String numDoc,
 			@QueryParam("segundaDosis") String segundaDosis, @QueryParam("numCelular") String numCelular,
@@ -177,11 +171,22 @@ public class Resource {
 		m.put("data",MicroRed.listAll());
 		return m;
 	}
+	
+	@POST
+    @Path("/disabled")
+    public Object saveDisabled(Disabled entity) {
+        service.saveDisabled(entity);
+        return entity;
+    }
 
+	@GET
+    @Path("/disabled/{id}")
+    public Disabled find(@PathParam("id") Integer id) {
+        return service.findDisabled(id);
+    }
 
 	@GET
 	@Path("/disabled/{from}/{to}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public Object listDisabled(@PathParam Integer from, @PathParam Integer to, @QueryParam("query") String filter,
 			@QueryParam("datos") String datos, @QueryParam("numDoc") String numDoc,
 			@QueryParam("segundaDosis") String segundaDosis, @QueryParam("numCelular") String numCelular,
@@ -203,6 +208,35 @@ public class Resource {
 		m.put("data", service.loadDisabled(from, to, null, m));
 		return m;
 	}
+
+	@GET
+	@Path("/disabled/certificate/{from}/{to}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object listDisabledCertificate(@PathParam Integer from, @PathParam Integer to, @QueryParam("query") String filter,
+			@QueryParam("datos") String datos, @QueryParam("numDoc") String numDoc,
+			@QueryParam("segundaDosis") String segundaDosis, @QueryParam("numCelular") String numCelular,
+			@QueryParam("red") String red, @QueryParam("lugarVacunacion") String lugarVacunacion) throws SQLException {
+		Map m = new HashMap();
+		if (red != null)
+			m.put("red", red);
+		if (datos != null)
+			m.put("datos", datos);
+		if (numDoc != null)
+			m.put("numDoc", numDoc);
+		if (segundaDosis != null)
+			m.put("segundaDosis", segundaDosis);
+		if (numCelular != null)
+			m.put("numCelular", numCelular);
+		if (lugarVacunacion != null)
+			m.put("lugarVacunacion", lugarVacunacion);
+
+		m.put("data", service.loadDisabledCertificate(from, to, null, m));
+		return m;
+	}
+
+
+
+
 
 	@POST
 	@Path("/vaccine")

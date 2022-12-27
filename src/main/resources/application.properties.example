@@ -12,7 +12,17 @@ quarkus.datasource.minsa.db-kind=
 quarkus.datasource.minsa.username=
 quarkus.datasource.minsa.password=
 quarkus.datasource.minsa.jdbc.url=
-quarkus.datasource.minsa.jdbc.max-size=16
 
+quarkus.datasource.minsa.jdbc.max-size=16
 quarkus.hibernate-orm.minsa.datasource=minsa
 quarkus.hibernate-orm.minsa.packages=gob.regionancash.minsa.jpa
+
+quarkus.datasource.grds.db-kind=
+quarkus.datasource.grds.username=
+quarkus.datasource.grds.password=
+quarkus.datasource.grds.jdbc.url=
+
+quarkus.datasource.grds.jdbc.max-size=16
+quarkus.datasource.grds.jdbc.new-connection-sql=USE BD_GRDS
+quarkus.hibernate-orm.grds.datasource=grds
+quarkus.hibernate-orm.grds.packages=gob.regionancash.grds.mssql.jpa

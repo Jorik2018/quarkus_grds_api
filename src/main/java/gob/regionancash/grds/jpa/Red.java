@@ -1,4 +1,4 @@
-package gob.regionancash.sgds.jpa;
+package gob.regionancash.grds.jpa;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;

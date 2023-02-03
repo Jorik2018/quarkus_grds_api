@@ -188,16 +188,27 @@ public class Resource {
 	@GET
 	@Path("/disabled/{from}/{to}")
 	public Object listDisabled(@PathParam Integer from, @PathParam Integer to, @QueryParam("query") String filter,
-			@QueryParam("datos") String datos, @QueryParam("numDoc") String numDoc,
+			@QueryParam("datos") String datos,
+			@QueryParam("numDoc") String numDoc,
+			@QueryParam("code") String code,
+			@QueryParam("fullName") String fullName,
 			@QueryParam("segundaDosis") String segundaDosis, @QueryParam("numCelular") String numCelular,
 			@QueryParam("red") String red, @QueryParam("lugarVacunacion") String lugarVacunacion) throws SQLException {
 		Map m = new HashMap();
+
+		if (fullName != null)
+			m.put("fullName", fullName); 
+
+		if (code != null)
+			m.put("code", code);
 		if (red != null)
 			m.put("red", red);
 		if (datos != null)
 			m.put("datos", datos);
-		if (numDoc != null)
+		if (numDoc != null){
 			m.put("numDoc", numDoc);
+			m.put("code", numDoc);
+		}
 		if (segundaDosis != null)
 			m.put("segundaDosis", segundaDosis);
 		if (numCelular != null)

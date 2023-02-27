@@ -24,7 +24,7 @@ dependencies {
     implementation 'org.jboss.resteasy:resteasy-client'
     implementation 'org.jboss.resteasy:resteasy-multipart-provider:6.0.0.Final'
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
-    implementation files('E:/projects/java/spring/isobit/build/libs/isobit.jar')
+    implementation files('D:/projects/java/spring/isobit/build/libs/isobit.jar')
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
 }

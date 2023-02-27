@@ -133,17 +133,6 @@ public class Resource {
 		Map m = new HashMap();
 		if (red != null)
 			m.put("red", red);
-		if (datos != null)
-			m.put("datos", datos);
-		if (numDoc != null)
-			m.put("numDoc", numDoc);
-		if (segundaDosis != null)
-			m.put("segundaDosis", segundaDosis);
-		if (numCelular != null)
-			m.put("numCelular", numCelular);
-		if (lugarVacunacion != null)
-			m.put("lugarVacunacion", lugarVacunacion);
-
 		m.put("data",Red.listAll());
 		return m;
 	}
@@ -243,6 +232,7 @@ public class Resource {
 
 		m.put("data", service.loadDisabledCertificate(from, to, null, m));
 		return m;
+	
 	}
 
 

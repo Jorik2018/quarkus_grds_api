@@ -131,8 +131,7 @@ public class Resource {
 			@QueryParam("segundaDosis") String segundaDosis, @QueryParam("numCelular") String numCelular,
 			@QueryParam("red") String red, @QueryParam("lugarVacunacion") String lugarVacunacion) throws SQLException {
 		Map m = new HashMap();
-		if (red != null)
-			m.put("red", red);
+		m.put("size", Red.count());
 		m.put("data",Red.listAll());
 		return m;
 	}
@@ -146,17 +145,6 @@ public class Resource {
 		Map m = new HashMap();
 		if (red != null)
 			m.put("red", red);
-		if (datos != null)
-			m.put("datos", datos);
-		if (numDoc != null)
-			m.put("numDoc", numDoc);
-		if (segundaDosis != null)
-			m.put("segundaDosis", segundaDosis);
-		if (numCelular != null)
-			m.put("numCelular", numCelular);
-		if (lugarVacunacion != null)
-			m.put("lugarVacunacion", lugarVacunacion);
-
 		m.put("data",MicroRed.listAll());
 		return m;
 	}

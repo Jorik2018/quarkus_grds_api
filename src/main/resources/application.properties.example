@@ -6,7 +6,7 @@ quarkus.datasource.username=
 quarkus.datasource.password=
 quarkus.datasource.jdbc.url=
 
-quarkus.hibernate-orm.packages=gob.regionancash.rgds.jpa
+quarkus.hibernate-orm.packages=gob.regionancash.grds.jpa
 
 quarkus.datasource.minsa.db-kind=
 quarkus.datasource.minsa.username=
